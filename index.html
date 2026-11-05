@@ -4,42 +4,61 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Запуск TBusiness</title>
-    <!-- Подключаем скрипт Telegram, чтобы иметь возможность закрыть WebApp -->
     <script src="https://telegram.org"></script>
     <style>
         body {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: #1c1c1e;
             color: #ffffff;
-        }
-        .loader {
             text-align: center;
+        }
+        .btn {
+            display: block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background-color: #007aff;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div class="loader">
-        <h3>Переходим в приложение...</h3>
-    </div>
+
+    <h3 id="status">Переходим в приложение...</h3>
+    
+    <!-- Кнопка на случай, если авто-редирект заблокирован системой -->
+    <a href="tbusiness://salary" class="btn" id="manual-btn">Открыть вручную</a>
 
     <script>
-        // Инициализируем Telegram WebApp
         const tg = window.Telegram.WebApp;
         tg.ready();
 
-        // Пытаемся сразу открыть ваш диплинк
-        window.location.href = "tbusiness://salary";
+        // Функция попытки открытия
+        function tryOpen() {
+            window.location.href = "tbusiness://salary";
+        }
 
-        // Через 500 миллисекунд закрываем шторку WebApp в Telegram,
-        // чтобы пользователь сразу вернулся в чат с ботом
+        // Вызываем сразу при загрузке
+        tryOpen();
+
+        // Если через 1.5 секунды приложение не открылось и шторка не закрылась,
+        // меняем текст и предлагаем нажать кнопку вручную
         setTimeout(() => {
-            tg.close();
-        }, 500);
+            document.getElementById("status").innerText = "Если приложение не открылось, нажмите кнопку ниже:";
+        }, 1500);
+
+        // Вешаем событие на кнопку: при клике также пробуем закрыть WebApp чуть позже
+        document.getElementById("manual-btn").addEventListener("click", () => {
+            setTimeout(() => { tg.close(); }, 1000);
+        });
     </script>
 </body>
 </html>
